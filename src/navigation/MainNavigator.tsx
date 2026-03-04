@@ -36,11 +36,7 @@ export const MainNavigator: React.FC = () => {
           if (route.name === 'Dashboard') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'AddExpense') {
-            return (
-              <View style={styles.addButton}>
-                <Ionicons name="add" size={26} color="#FFFFFF" />
-              </View>
-            );
+            iconName = focused ? 'add' : 'add-outline';
           } else if (route.name === 'Expenses') {
             iconName = focused ? 'list' : 'list-outline';
           } else if (route.name === 'Profile') {
@@ -86,19 +82,5 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 11,
     fontWeight: '600',
-  },
-  addButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#6366F1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
-    marginBottom: 4,
   },
 });
