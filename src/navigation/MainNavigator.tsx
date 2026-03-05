@@ -15,21 +15,21 @@ export const MainNavigator: React.FC = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerStyle: {
-          backgroundColor: '#0F172A',
+          backgroundColor: '#000',
           shadowColor: 'transparent',
           elevation: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#1E293B',
+          borderBottomColor: '#1a1a1a',
         },
         headerTitleStyle: {
-          color: '#F8FAFC',
+          color: '#fff',
           fontWeight: '700',
-          fontSize: 18,
+          fontSize: 17,
         },
-        headerTintColor: '#F8FAFC',
+        headerTintColor: '#fff',
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#6366F1',
-        tabBarInactiveTintColor: '#64748B',
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#444',
         tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: any;
@@ -72,15 +72,16 @@ export const MainNavigator: React.FC = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#1E293B',
-    borderTopColor: '#334155',
+    backgroundColor: '#111',
+    borderTopColor: '#1a1a1a',
     borderTopWidth: 1,
-    height: Platform.OS === 'ios' ? 85 : 65,
-    paddingBottom: Platform.OS === 'ios' ? 25 : 8,
+    height: Platform.OS === 'ios' ? 85 : 64,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
     paddingTop: 8,
   },
   tabLabel: {
     fontSize: 11,
     fontWeight: '600',
   },
+ 
 });

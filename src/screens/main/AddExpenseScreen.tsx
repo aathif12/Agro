@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { expenseService } from '../../services/expenseService';
-import { CATEGORIES, CATEGORY_COLORS, CATEGORY_ICONS, Category } from '../../types';
+import { CATEGORIES, Category } from '../../types';
 import { format } from 'date-fns';
 
 export const AddExpenseScreen: React.FC = () => {
@@ -44,7 +44,7 @@ export const AddExpenseScreen: React.FC = () => {
         description: description.trim() || undefined,
         date,
       });
-      Alert.alert('Success', 'Expense added successfully!', [
+      Alert.alert('Success', 'Expense added successfully.', [
         {
           text: 'OK',
           onPress: () => {
@@ -72,18 +72,14 @@ export const AddExpenseScreen: React.FC = () => {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.screenTitle}>Add Expense</Text>
-        <Text style={styles.screenSubtitle}>Record a new expense below</Text>
-
         {/* Title */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Title</Text>
           <View style={styles.inputWrapper}>
-            <Ionicons name="create-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
-              placeholder="e.g. Lunch at Café"
-              placeholderTextColor="#9CA3AF"
+              placeholder="e.g. Lunch at cafe"
+              placeholderTextColor="#555"
               value={title}
               onChangeText={setTitle}
             />
@@ -94,11 +90,11 @@ export const AddExpenseScreen: React.FC = () => {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Amount (LKR)</Text>
           <View style={styles.inputWrapper}>
-            <Text style={styles.currencySymbol}>Rs.</Text>
+            <Text style={styles.currencyLabel}>Rs.</Text>
             <TextInput
               style={styles.input}
               placeholder="0.00"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#555"
               value={amount}
               onChangeText={setAmount}
               keyboardType="decimal-pad"
@@ -108,52 +104,37 @@ export const AddExpenseScreen: React.FC = () => {
 
         {/* Date */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Date (YYYY-MM-DD)</Text>
+          <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
-            <Ionicons name="calendar-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+            <Ionicons name="calendar-outline" size={16} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#555"
               value={date}
               onChangeText={setDate}
             />
           </View>
         </View>
 
-        {/* Category Selector */}
+        {/* Category */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Category</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoryScroll}
+            contentContainerStyle={styles.chipRow}
           >
             {CATEGORIES.map((cat) => {
-              const color = CATEGORY_COLORS[cat];
-              const icon = CATEGORY_ICONS[cat];
               const selected = category === cat;
               return (
                 <TouchableOpacity
                   key={cat}
-                  style={[
-                    styles.categoryChip,
-                    selected && { backgroundColor: color, borderColor: color },
-                  ]}
+                  style={[styles.chip, selected && styles.chipSelected]}
                   onPress={() => setCategory(cat)}
-                  activeOpacity={0.75}
+                  activeOpacity={0.7}
                 >
-                  <Ionicons
-                    name={icon as any}
-                    size={16}
-                    color={selected ? '#fff' : color}
-                  />
-                  <Text
-                    style={[
-                      styles.categoryChipText,
-                      selected && styles.categoryChipTextSelected,
-                    ]}
-                  >
+                  <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
                     {cat}
                   </Text>
                 </TouchableOpacity>
@@ -162,31 +143,10 @@ export const AddExpenseScreen: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Selected Category Display */}
-        <View
-          style={[
-            styles.selectedCategoryCard,
-            { borderColor: CATEGORY_COLORS[category] + '44' },
-          ]}
-        >
-          <View
-            style={[
-              styles.selectedCategoryIcon,
-              { backgroundColor: CATEGORY_COLORS[category] + '22' },
-            ]}
-          >
-            <Ionicons
-              name={CATEGORY_ICONS[category] as any}
-              size={28}
-              color={CATEGORY_COLORS[category]}
-            />
-          </View>
-          <View>
-            <Text style={styles.selectedCategoryLabel}>Selected Category</Text>
-            <Text style={[styles.selectedCategoryName, { color: CATEGORY_COLORS[category] }]}>
-              {category}
-            </Text>
-          </View>
+        {/* Selected display */}
+        <View style={styles.selectedRow}>
+          <Ionicons name="pricetag-outline" size={14} color="#666" />
+          <Text style={styles.selectedText}>{category}</Text>
         </View>
 
         {/* Description */}
@@ -195,8 +155,8 @@ export const AddExpenseScreen: React.FC = () => {
           <View style={[styles.inputWrapper, styles.textareaWrapper]}>
             <TextInput
               style={[styles.input, styles.textarea]}
-              placeholder="Add notes or details..."
-              placeholderTextColor="#9CA3AF"
+              placeholder="Add notes..."
+              placeholderTextColor="#555"
               value={description}
               onChangeText={setDescription}
               multiline
@@ -206,21 +166,17 @@ export const AddExpenseScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleAdd}
           disabled={loading}
-          activeOpacity={0.85}
+          activeOpacity={0.8}
         >
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <>
-              <Ionicons name="add-circle" size={22} color="#fff" />
-              <Text style={styles.buttonText}>Add Expense</Text>
-            </>
-          )}
+          {loading
+            ? <ActivityIndicator color="#000" />
+            : <Text style={styles.buttonText}>Add Expense</Text>
+          }
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -230,135 +186,106 @@ export const AddExpenseScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#000',
   },
   content: {
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 40,
-  },
-  screenTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    marginBottom: 4,
-  },
-  screenSubtitle: {
-    fontSize: 14,
-    color: '#94A3B8',
-    marginBottom: 28,
+    paddingBottom: 48,
   },
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 18,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#CBD5E1',
+    color: '#888',
     marginBottom: 8,
-    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderRadius: 14,
+    backgroundColor: '#111',
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#222',
     paddingHorizontal: 14,
-    height: 52,
+    height: 50,
   },
   textareaWrapper: {
-    height: 96,
+    height: 90,
     alignItems: 'flex-start',
     paddingVertical: 12,
   },
   inputIcon: {
-    marginRight: 10,
+    marginRight: 8,
   },
-  currencySymbol: {
-    color: '#94A3B8',
-    fontSize: 15,
+  currencyLabel: {
+    color: '#666',
+    fontSize: 14,
     fontWeight: '600',
     marginRight: 8,
   },
   input: {
     flex: 1,
-    color: '#F8FAFC',
+    color: '#fff',
     fontSize: 15,
   },
   textarea: {
-    height: 72,
+    height: 66,
   },
-  categoryScroll: {
+  chipRow: {
     gap: 8,
-    paddingBottom: 4,
+    paddingBottom: 2,
   },
-  categoryChip: {
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 50,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  chipSelected: {
+    backgroundColor: '#fff',
+    borderColor: '#fff',
+  },
+  chipText: {
+    color: '#888',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  chipTextSelected: {
+    color: '#000',
+    fontWeight: '700',
+  },
+  selectedRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#1E293B',
-    borderRadius: 50,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1.5,
-    borderColor: '#334155',
-  },
-  categoryChipText: {
-    fontSize: 13,
-    color: '#94A3B8',
-    fontWeight: '500',
-  },
-  categoryChipTextSelected: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  selectedCategoryCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: '#1E293B',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1.5,
     marginBottom: 20,
+    marginTop: -6,
   },
-  selectedCategoryIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  selectedCategoryLabel: {
-    fontSize: 12,
-    color: '#64748B',
-    marginBottom: 2,
-  },
-  selectedCategoryName: {
-    fontSize: 17,
-    fontWeight: '700',
+  selectedText: {
+    fontSize: 13,
+    color: '#666',
   },
   button: {
-    backgroundColor: '#6366F1',
-    borderRadius: 16,
-    height: 58,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
     marginTop: 8,
-    shadowColor: '#6366F1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
   },
-  buttonDisabled: { opacity: 0.7 },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 17,
+    color: '#000',
+    fontSize: 15,
     fontWeight: '700',
   },
 });

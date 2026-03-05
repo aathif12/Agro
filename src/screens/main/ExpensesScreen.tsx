@@ -12,20 +12,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { expenseService } from '../../services/expenseService';
-import {
-  CATEGORIES,
-  CATEGORY_COLORS,
-  CATEGORY_ICONS,
-  Category,
-  Expense,
-} from '../../types';
+import { CATEGORIES, Category, Expense } from '../../types';
 import { format } from 'date-fns';
 
 export const ExpensesScreen: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>(
-    'All',
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -63,71 +55,50 @@ export const ExpensesScreen: React.FC = () => {
   };
 
   const handleDelete = (id: string, title: string) => {
-    Alert.alert(
-      'Delete Expense',
-      `Are you sure you want to delete "${title}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await expenseService.delete(id);
-            setExpenses((prev) => prev.filter((e) => e.id !== id));
-          },
+    Alert.alert('Delete Expense', `Delete "${title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await expenseService.delete(id);
+          setExpenses((prev) => prev.filter((e) => e.id !== id));
         },
-      ],
-    );
+      },
+    ]);
   };
 
   const total = expenses.reduce((s, e) => s + e.amount, 0);
 
-  const renderItem = ({ item }: { item: Expense }) => {
-    const color = CATEGORY_COLORS[item.category] || '#6366F1';
-    const icon = CATEGORY_ICONS[item.category] || 'ellipsis-horizontal';
-    return (
-      <View style={styles.expenseCard}>
-        <View style={[styles.expenseIcon, { backgroundColor: color + '22' }]}>
-          <Ionicons name={icon as any} size={22} color={color} />
-        </View>
-        <View style={styles.expenseInfo}>
-          <Text style={styles.expenseTitle} numberOfLines={1}>
-            {item.title}
-          </Text>
-          <View style={styles.expenseMeta}>
-            <View style={[styles.catBadge, { backgroundColor: color + '22' }]}>
-              <Text style={[styles.catBadgeText, { color }]}>
-                {item.category}
-              </Text>
-            </View>
-            <Text style={styles.expenseDate}>
-              {format(new Date(item.date), 'MMM d, yyyy')}
-            </Text>
-          </View>
-          {item.description ? (
-            <Text style={styles.expenseDesc} numberOfLines={1}>
-              {item.description}
-            </Text>
-          ) : null}
-        </View>
-        <View style={styles.expenseRight}>
-          <Text style={styles.expenseAmount}>
-            LKR {item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-          </Text>
-          <TouchableOpacity
-            onPress={() => handleDelete(item.id, item.title)}
-            style={styles.deleteBtn}
-          >
-            <Ionicons name="trash-outline" size={18} color="#F87171" />
-          </TouchableOpacity>
-        </View>
+  const renderItem = ({ item }: { item: Expense }) => (
+    <View style={styles.expenseCard}>
+      <View style={styles.expenseInfo}>
+        <Text style={styles.expenseTitle} numberOfLines={1}>{item.title}</Text>
+        <Text style={styles.expenseMeta}>
+          {item.category} · {format(new Date(item.date), 'MMM d, yyyy')}
+        </Text>
+        {item.description ? (
+          <Text style={styles.expenseDesc} numberOfLines={1}>{item.description}</Text>
+        ) : null}
       </View>
-    );
-  };
+      <View style={styles.expenseRight}>
+        <Text style={styles.expenseAmount}>
+          LKR {item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        </Text>
+        <TouchableOpacity
+          onPress={() => handleDelete(item.id, item.title)}
+          style={styles.deleteBtn}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="trash-outline" size={16} color="#555" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* Category filter row */}
+      {/* Category Filter */}
       <FlatList
         horizontal
         data={(['All', ...CATEGORIES] as (Category | 'All')[])}
@@ -136,31 +107,14 @@ export const ExpensesScreen: React.FC = () => {
         contentContainerStyle={styles.filterRow}
         style={styles.filterList}
         renderItem={({ item: cat }) => {
-          const isAll = cat === 'All';
-          const color = isAll ? '#6366F1' : CATEGORY_COLORS[cat as Category];
           const selected = selectedCategory === cat;
           return (
             <TouchableOpacity
-              style={[
-                styles.filterChip,
-                selected && { backgroundColor: color, borderColor: color },
-              ]}
+              style={[styles.filterChip, selected && styles.filterChipSelected]}
               onPress={() => handleCategoryChange(cat)}
-              activeOpacity={0.75}
+              activeOpacity={0.7}
             >
-              {!isAll && (
-                <Ionicons
-                  name={CATEGORY_ICONS[cat as Category] as any}
-                  size={14}
-                  color={selected ? '#fff' : color}
-                />
-              )}
-              <Text
-                style={[
-                  styles.filterChipText,
-                  { color: selected ? '#fff' : color },
-                ]}
-              >
+              <Text style={[styles.filterChipText, selected && styles.filterChipTextSelected]}>
                 {cat}
               </Text>
             </TouchableOpacity>
@@ -170,18 +124,17 @@ export const ExpensesScreen: React.FC = () => {
 
       {/* Summary bar */}
       <View style={styles.summaryBar}>
-        <Text style={styles.summaryBarText}>
-          {expenses.length} expense{expenses.length !== 1 ? 's' : ''}
+        <Text style={styles.summaryBarCount}>
+          {expenses.length} record{expenses.length !== 1 ? 's' : ''}
         </Text>
         <Text style={styles.summaryBarTotal}>
-          Total: LKR{' '}
-          {total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          LKR {total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
         </Text>
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6366F1" />
+          <ActivityIndicator size="large" color="#fff" />
         </View>
       ) : (
         <FlatList
@@ -192,20 +145,16 @@ export const ExpensesScreen: React.FC = () => {
             expenses.length === 0 ? styles.emptyContainer : styles.listContent
           }
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#6366F1"
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#fff" />
           }
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Ionicons name="search-outline" size={48} color="#475569" />
+              <Ionicons name="document-outline" size={40} color="#333" />
               <Text style={styles.emptyTitle}>No expenses found</Text>
               <Text style={styles.emptySubtitle}>
                 {selectedCategory === 'All'
                   ? 'Add your first expense using the + tab'
-                  : `No expenses in "${selectedCategory}" category`}
+                  : `No expenses in "${selectedCategory}"`}
               </Text>
             </View>
           }
@@ -218,7 +167,7 @@ export const ExpensesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#000',
   },
   filterList: {
     flexGrow: 0,
@@ -229,39 +178,43 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   filterChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#1E293B',
-    borderRadius: 50,
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1.5,
-    borderColor: '#334155',
+    paddingVertical: 7,
+    borderRadius: 50,
+    backgroundColor: '#111',
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  filterChipSelected: {
+    backgroundColor: '#fff',
+    borderColor: '#fff',
   },
   filterChipText: {
     fontSize: 13,
-    fontWeight: '600',
+    color: '#666',
+    fontWeight: '500',
+  },
+  filterChipTextSelected: {
+    color: '#000',
+    fontWeight: '700',
   },
   summaryBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#1E293B',
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#1a1a1a',
   },
-  summaryBarText: {
-    color: '#94A3B8',
+  summaryBarCount: {
+    color: '#666',
     fontSize: 13,
-    fontWeight: '500',
   },
   summaryBarTotal: {
-    color: '#F8FAFC',
+    color: '#fff',
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -270,7 +223,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    gap: 10,
   },
   emptyContainer: {
     flex: 1,
@@ -280,53 +232,28 @@ const styles = StyleSheet.create({
   expenseCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#334155',
-    marginBottom: 10,
-  },
-  expenseIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderColor: '#1a1a1a',
   },
   expenseInfo: {
     flex: 1,
+    marginRight: 12,
   },
   expenseTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#F1F5F9',
-    marginBottom: 5,
-  },
-  expenseMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    color: '#fff',
     marginBottom: 3,
   },
-  catBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-  },
-  catBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  expenseDate: {
-    fontSize: 11,
-    color: '#64748B',
+  expenseMeta: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 2,
   },
   expenseDesc: {
     fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
+    color: '#444',
   },
   expenseRight: {
     alignItems: 'flex-end',
@@ -334,25 +261,25 @@ const styles = StyleSheet.create({
   },
   expenseAmount: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#F87171',
+    fontWeight: '600',
+    color: '#ccc',
   },
   deleteBtn: {
-    padding: 4,
+    padding: 2,
   },
   empty: {
     alignItems: 'center',
     gap: 10,
-    paddingTop: 40,
+    paddingTop: 60,
   },
   emptyTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#94A3B8',
+    color: '#444',
   },
   emptySubtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#333',
     textAlign: 'center',
     paddingHorizontal: 40,
   },

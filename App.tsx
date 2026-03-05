@@ -4,13 +4,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ActivityIndicator, View } from 'react-native';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { AuthNavigator } from './src/navigation/AuthNavigator';
 import { MainNavigator } from './src/navigation/MainNavigator';
 import { RootStackParamList } from './src/types';
-import { ActivityIndicator, View } from 'react-native';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -19,8 +18,8 @@ const RootNavigator: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366F1" />
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#fff" />
       </View>
     );
   }
@@ -41,7 +40,7 @@ export default function App() {
     <GestureHandlerRootView style={styles.root}>
       <AuthProvider>
         <NavigationContainer>
-          <StatusBar style="light" backgroundColor="#0F172A" />
+          <StatusBar style="light" backgroundColor="#000" />
           <RootNavigator />
         </NavigationContainer>
       </AuthProvider>
@@ -52,10 +51,11 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#000',
   },
-  loadingContainer: {
+  loading: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
   },
